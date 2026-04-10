@@ -1,0 +1,28 @@
+{
+    "name": "kusanaji",
+    "version": "1.2.0",
+    "description": "Japanese text converter — romaji, hiragana, katakana, furigana with multiple output modes",
+    "author": "Kimura Risei <kimura.risei@gmail.com>",
+    "license": "BUSL-1.1",
+    "main": "lib/index.js",
+    "module": "src/index.js",
+    "engines": {
+        "node": ">=18"
+    },
+    "scripts": {
+        "build": "esbuild src/index.js --bundle --platform=node --target=node18 --outfile=lib/index.js --format=cjs --external:kusanaji-analyzer",
+        "test": "echo \"Tests not yet migrated\"",
+        "lint": "echo \"Linter not yet configured\""
+    },
+    "keywords": [
+        "japanese",
+        "romaji",
+        "hiragana",
+        "katakana",
+        "furigana",
+        "converter"
+    ],
+    "devDependencies": {
+        "esbuild": "^0.28.0"
+    }
+}
