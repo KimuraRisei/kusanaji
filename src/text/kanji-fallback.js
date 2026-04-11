@@ -47,10 +47,13 @@ export function loadFallbackFromBinary(buffer) {
     const map = new Map()
     let offset = 0
 
+    if (buf.length < 4) throw new Error('fallback.dat is too small (< 4 bytes)')
     const count = buf.readUInt32LE(offset); offset += 4
 
     for (let i = 0; i < count; i++) {
+        if (offset + 2 > buf.length) break  // truncated — stop gracefully
         const sLen = buf.readUInt16LE(offset); offset += 2
+        if (offset + sLen + 2 > buf.length) break  // truncated
         const surface = buf.toString('utf8', offset, offset + sLen); offset += sLen
         const rLen = buf.readUInt16LE(offset); offset += 2
         const reading = buf.toString('utf8', offset, offset + rLen); offset += rLen
