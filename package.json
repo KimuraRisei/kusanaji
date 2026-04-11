@@ -4,8 +4,34 @@
     "description": "Japanese text converter — romaji, hiragana, katakana, furigana with multiple output modes",
     "author": "Kimura Risei <kimura.risei@gmail.com>",
     "license": "BUSL-1.1",
-    "main": "lib/index.js",
-    "module": "src/index.js",
+    "main": "src/index.js",
+    "exports": {
+        ".": {
+            "import": "./src/index.js",
+            "default": "./src/index.js"
+        },
+        "./pipeline": {
+            "import": "./src/pipeline/prepasses.js"
+        },
+        "./romaji": {
+            "import": "./src/romaji/emit.js"
+        },
+        "./kana": {
+            "import": "./src/kana/emit.js"
+        },
+        "./text": {
+            "import": "./src/text/segment-mixed.js"
+        },
+        "./text/kanji-fallback": {
+            "import": "./src/text/kanji-fallback.js"
+        },
+        "./text/unknown-fallback": {
+            "import": "./src/text/unknown-fallback.js"
+        },
+        "./text/jp-punctuation": {
+            "import": "./src/text/jp-punctuation.js"
+        }
+    },
     "engines": {
         "node": ">=18"
     },
