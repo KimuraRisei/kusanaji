@@ -13,8 +13,9 @@
  * @returns {boolean}
  */
 export function isWordToken(token) {
+    if (!token || !token.surface_form) return false
     const s = token.surface_form
-    if (s.trim().length === 0) return false
+    if (typeof s !== 'string' || s.trim().length === 0) return false
     if (token.pos === '記号') return false
     if (/^[!"#$%&'()*+,\-./:;<=>?@[\\\]^_`{|}~。、・「」『』（）【】〈〉《》〔〕｛｝［］〜ー―…‥！？　]+$/.test(s)) return false
     return true
