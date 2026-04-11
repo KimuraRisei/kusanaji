@@ -1,9 +1,17 @@
 {
     "name": "kusanaji",
-    "version": "1.2.0",
-    "description": "Japanese text converter — romaji, hiragana, katakana, furigana with multiple output modes",
+    "version": "1.0.0",
+    "description": "Japanese text converter for Node.js — romaji (5 systems), hiragana, katakana, furigana with prepasses, mixed-language segmentation, and kanji fallback",
     "author": "Kimura Risei <kimura.risei@gmail.com>",
     "license": "BUSL-1.1",
+    "homepage": "https://github.com/KimuraRisei/kusanaji#readme",
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/KimuraRisei/kusanaji.git"
+    },
+    "bugs": {
+        "url": "https://github.com/KimuraRisei/kusanaji/issues"
+    },
     "main": "src/index.js",
     "exports": {
         ".": {
@@ -32,11 +40,15 @@
             "import": "./src/text/jp-punctuation.js"
         }
     },
+    "files": [
+        "src/",
+        "README.md",
+        "LICENSE"
+    ],
     "engines": {
         "node": ">=18"
     },
     "scripts": {
-        "build": "esbuild src/index.js --bundle --platform=node --target=node18 --outfile=lib/index.js --format=cjs --external:kusanaji-analyzer",
         "test": "node --test test/*.test.mjs",
         "lint": "echo \"Linter not yet configured\""
     },
@@ -46,7 +58,11 @@
         "hiragana",
         "katakana",
         "furigana",
-        "converter"
+        "converter",
+        "nlp",
+        "hepburn",
+        "kunrei",
+        "wapuro"
     ],
     "devDependencies": {
         "esbuild": "^0.28.0"
