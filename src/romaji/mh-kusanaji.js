@@ -7,8 +7,8 @@
  * proper okurigana handling. We delegate the romanization to it and only
  * apply targeted post-passes for the cases kusanaji misses.
  *
- * The kusanaji instance is injected by the consumer (dict-api or
- * jala-ui's local fallback). This module does NOT import kusanaji.
+ * The kusanaji instance is injected by the consumer via the deps
+ * object. This module does NOT import kusanaji directly.
  */
 
 import { joinVerbForms } from './join-verb-forms.js'
