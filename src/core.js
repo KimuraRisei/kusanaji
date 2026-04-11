@@ -221,7 +221,7 @@ class Kusanaji {
                         break;
                     case 2:
                         for (let c2 = 0; c2 < tokens[i].surface_form.length; c2++) {
-                            // PATCH (jala): NEologd named-entity tokens (e.g.
+                            // PATCH: NEologd named-entity tokens (e.g.
                             // 「ニューヨーク・タイムズ」) can have surface_form longer
                             // than reading because the dictionary reading omits the
                             // ・ interpunct. Without bound checking, reading[c2] is
