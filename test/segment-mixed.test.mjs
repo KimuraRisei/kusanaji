@@ -1,0 +1,63 @@
+import { describe, it } from "node:test";
+import assert from "node:assert/strict";
+import { segmentMixed, hasJapanese } from "../src/text/segment-mixed.js";
+
+describe("segmentMixed", () => {
+    it("returns empty for null/empty", () => {
+        assert.deepEqual(segmentMixed(null), []);
+        assert.deepEqual(segmentMixed(""), []);
+    });
+
+    it("pure Japanese → single segment", () => {
+        const segs = segmentMixed("東京タワー");
+        assert.equal(segs.length, 1);
+        assert.equal(segs[0].type, "japanese");
+        assert.equal(segs[0].text, "東京タワー");
+    });
+
+    it("pure ASCII → single segment", () => {
+        const segs = segmentMixed("hello world");
+        assert.equal(segs.length, 1);
+        assert.equal(segs[0].type, "foreign");
+    });
+
+    it("splits ASCII and Japanese", () => {
+        const segs = segmentMixed("Yahoo!ニュースの機能");
+        assert.ok(segs.length >= 2);
+        assert.equal(segs[0].type, "foreign");
+        assert.ok(segs[0].text.includes("Yahoo"));
+    });
+
+    it("moves leading particle to foreign segment", () => {
+        const segs = segmentMixed("JavaScriptの設定");
+        // の should be moved to the foreign segment (JavaScriptの)
+        const foreign = segs.find(s => s.type === "foreign");
+        assert.ok(foreign);
+        assert.ok(foreign.text.includes("の"), `Expected の in foreign segment: ${foreign.text}`);
+    });
+
+    it("splits on sentence punctuation", () => {
+        const segs = segmentMixed("テスト。次の文。");
+        assert.ok(segs.length >= 2, `Expected >=2 segments, got ${segs.length}`);
+    });
+
+    it("micro-splits long Japanese segments on clause boundaries", () => {
+        const long = "これは非常に長い日本語の文章であり、テスト用に作成されたものです。";
+        const segs = segmentMixed(long);
+        // Should split on 、 and 。
+        assert.ok(segs.length >= 2, `Expected >=2 segments for long text, got ${segs.length}`);
+    });
+});
+
+describe("hasJapanese", () => {
+    it("returns true for Japanese text", () => {
+        assert.equal(hasJapanese("東京"), true);
+        assert.equal(hasJapanese("ひらがな"), true);
+        assert.equal(hasJapanese("カタカナ"), true);
+    });
+
+    it("returns false for ASCII", () => {
+        assert.equal(hasJapanese("hello"), false);
+        assert.equal(hasJapanese("123"), false);
+    });
+});

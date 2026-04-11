@@ -38,7 +38,8 @@ export function hasKana(text) {
  * @returns {string|null}
  */
 export function normalizeReading(reading) {
-    if (!reading) return null
+    if (reading == null || reading === '') return null
+    if (typeof reading !== 'string') return null
     if (reading === '*' || reading.trim() === '') return null
     return reading
 }

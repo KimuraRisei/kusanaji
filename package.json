@@ -37,7 +37,7 @@
     },
     "scripts": {
         "build": "esbuild src/index.js --bundle --platform=node --target=node18 --outfile=lib/index.js --format=cjs --external:kusanaji-analyzer",
-        "test": "echo \"Tests not yet migrated\"",
+        "test": "node --test test/*.test.mjs",
         "lint": "echo \"Linter not yet configured\""
     },
     "keywords": [
