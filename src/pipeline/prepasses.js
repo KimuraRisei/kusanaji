@@ -32,6 +32,7 @@ import { preprocessDigits } from '../prepasses/digit-runs.js'
  * @returns {{ preprocessed: string, digitRuns: string[] }}
  */
 export function runPrePasses(text, { targetScript }) {
+    if (!text || typeof text !== 'string') return { preprocessed: '', digitRuns: [] }
     const a = applyReadingOverrides(text, { targetScript })
     const b = applyIrregularCounterReadings(a, { targetScript })
     const c = rewriteCounters(b, { targetScript })

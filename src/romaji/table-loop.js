@@ -41,9 +41,9 @@ export function emitTableLoop(preprocessed, digitRuns, deps, opts) {
     const { system, separator, customSeparator, useMacrons, keepUnconvertedKanji } = opts
     const sepChar = separator === 'space' ? ' ' : separator === 'custom' ? customSeparator : ''
 
-    const rawTokens = tokenizer.tokenize(preprocessed)
+    const rawTokens = tokenizer.tokenize(preprocessed) || []
     // Resolve UNKNOWN tokens by re-tokenizing in smaller windows
-    const tokens = resolveUnknownTokens(rawTokens, tokenizer)
+    const tokens = resolveUnknownTokens(rawTokens, tokenizer) || []
 
     let out = ''
     let prevWasWord = false
