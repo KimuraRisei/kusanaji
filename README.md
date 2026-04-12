@@ -296,8 +296,8 @@ Kusanaji.Util.hasKanji('漢字') // true
 Kusanaji.Util.hasHiragana('ひらがな') // true
 Kusanaji.Util.hasKatakana('カタカナ') // true
 Kusanaji.Util.hasJapanese('hello') // false
-Kusanaji.Util.kanaToHiragana('カタカナ') // かたかな
-Kusanaji.Util.kanaToKatakana('ひらがな') // ヒラガナ
+Kusanaji.Util.isKanji('漢') // true
+Kusanaji.Util.isKana('あ') // true
 ```
 
 ## Conversion Pipeline

@@ -25,11 +25,14 @@
 import { katakanaToHiragana } from '../text/kana-script.js'
 
 const OVERRIDES_KATAKANA = {
-    // 行方不明 ("yukue fumei", missing/whereabouts unknown). NEologd picks
-    // the rare reading "ゆくえしれず → omokatashirezu" which only appears in
-    // archaic literary contexts. The standard news/spoken reading is
-    // ゆくえふめい. Triggered repeatedly in the NHK 50-snippet benchmark.
-    行方不明: 'ユクエフメイ',
+    // All rendaku and jukujikun compound readings have been migrated to the
+    // dictionary (dict-files/source/custom/overrides.csv). This map is kept
+    // empty. Only add entries here as a LAST RESORT for compounds where the
+    // dict override cannot work (e.g., the compound is split by the Viterbi
+    // despite having a dict entry). Prefer adding to overrides.csv instead.
+    //
+    // History: previously contained 行方不明 and 案内所 which are now in the
+    // custom dict with correct readings and appropriate costs.
 }
 
 // Hiragana mirror, built mechanically from the katakana table so the two
