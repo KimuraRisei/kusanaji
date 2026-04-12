@@ -1541,33 +1541,8 @@ const patchTokens = function (tokens) {
  * @param {string} str Given string
  * @return {string} Hiragana string
  */
-const kanaToHiragna = function (str) {
-    return toRawHiragana(str);
-};
-
-/**
- * Convert kana to katakana
- *
- * @param {string} str Given string
- * @return {string} Katakana string
- */
-const kanaToKatakana = function (str) {
-    return toRawKatakana(str);
-};
-
-/**
- * Convert kana to romaji
- *
- * @param {string} str Given string
- * @param {string} system To which romanization system the given string is converted. ["nippon"|"passport"|"hepburn"]
- * @return {string} Romaji string
- */
-const kanaToRomaji = function (str, system) {
-    return toRawRomaji(str, system);
-};
 
 export {
-    // language
     ROMANIZATION_SYSTEM,
     getStrType,
     patchTokens,
@@ -1584,7 +1559,4 @@ export {
     toRawHiragana,
     toRawKatakana,
     toRawRomaji,
-    kanaToHiragna,
-    kanaToKatakana,
-    kanaToRomaji
 };

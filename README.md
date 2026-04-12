@@ -142,16 +142,16 @@ await kusanaji.convert('綜合醫院で發表された聲明', {
 
 ### Counter readings
 
-Japanese counters have irregular readings with sokuon (促音) and rendaku (連濁). The prepass system handles both irregular and regular cases:
+Japanese counters have irregular readings with sokuon (促音) and rendaku (連濁). The tokenizer resolves all counter readings natively from the dictionary:
 
 ```js
-// Irregular counters — full reading replacement
+// Irregular counters — sokuon, rendaku, idiomatic readings
 await kusanaji.convert('1本のペンと3月9日', { to: 'romaji', mode: 'spaced' })
 // → ippon no pen to sangatsu kokonoka
 
-// Regular counters — suffix reading attached to digit
+// Large numbers and compound counters
 await kusanaji.convert('100人の学生が参加', { to: 'romaji', mode: 'spaced' })
-// → 100 nin no gakusei ga sanka
+// → hyakunin no gakusei ga sanka
 ```
 
 ### Particle override
@@ -305,7 +305,7 @@ Kusanaji.Util.isKana('あ') // true
 Kusanaji includes a full conversion pipeline with subpath exports for advanced use:
 
 ```js
-// Pre-processing passes (counter readings, digit protection, etc.)
+// Pre-processing passes (reading overrides)
 import { runPrePasses } from 'kusanaji/pipeline'
 
 // Romaji emitters (5 romanization systems)
@@ -333,10 +333,13 @@ All pipeline functions use **dependency injection** — pass your own kusanaji/t
 
 ```
 Input text
-  → segmentMixed()           split ASCII vs Japanese segments
-  → runPrePasses()           counter readings, reading overrides, digit protection
-  → emitRomaji() / emitKana()  convert via kusanaji or custom table-loop
-  → applyKanjiFallback()     best-effort lookup for any remaining kanji
+  → normalizeInput()           fullwidth→halfwidth letters, kyūjitai→shinjitai
+  → segmentMixed()             split ASCII vs Japanese segments
+  → runPrePasses()             reading overrides (minimal — tokenizer handles counters/digits)
+  → tokenizer                  NEologd dictionary resolves all readings
+  → emitRomaji() / emitKana()  convert tokens to romaji or kana
+  → applyKanjiFallback()       best-effort JMdict lookup for remaining kanji
+  → normalizeJpPunctuation()   、→, 。→. 〜→~ (romaji only)
   → output
 ```
 
