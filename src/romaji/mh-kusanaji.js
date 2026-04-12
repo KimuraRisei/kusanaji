@@ -15,7 +15,6 @@ import { joinVerbForms } from './join-verb-forms.js'
 import { collapseLongVowels } from './long-vowels.js'
 import { stripMacrons } from './systems.js'
 import { normalizeJpPunctuation } from '../text/jp-punctuation.js'
-import { restoreDigits } from '../prepasses/digit-runs.js'
 import { joinDigitRuns, fixDecimalPointSpacing } from './digit-postpass.js'
 
 /**
@@ -41,10 +40,7 @@ export async function emitMhKusanaji(preprocessed, digitRuns, deps, opts) {
     // Defensive macron pass — see collapseLongVowels for the rationale.
     if (useMacrons) raw = collapseLongVowels(raw)
 
-    // Restore digit runs from placeholders. Must run before joinDigitRuns,
-    // which handles the legacy "1 5" → "15" case for any single-digit
-    // splits the placeholder system didn't catch.
-    raw = restoreDigits(raw, digitRuns)
+    // Rejoin split digits: "1 5" → "15" (tokenizer splits multi-digit numbers)
     raw = joinDigitRuns(raw)
 
     // Collapse spaces around a literal "." that sits between two digit

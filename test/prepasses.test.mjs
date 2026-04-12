@@ -20,25 +20,20 @@ describe("runPrePasses", () => {
         assert.deepEqual(result.digitRuns, []);
     });
 
-    it("rewrites irregular counter readings", () => {
+    it("passes through counters unchanged (tokenizer handles natively)", () => {
         const result = runPrePasses("1本", { targetScript: "katakana" });
-        // 1本 → イッポン (irregular counter)
-        assert.ok(result.preprocessed.includes("イッポン") || result.preprocessed.includes("ポン"),
-            `Expected counter rewrite in: ${result.preprocessed}`);
+        assert.equal(result.preprocessed, "1本");
     });
 
-    it("protects digit runs with placeholders", () => {
+    it("passes through digits unchanged (tokenizer handles natively)", () => {
         const result = runPrePasses("2026年", { targetScript: "katakana" });
-        assert.ok(result.digitRuns.length > 0 || result.preprocessed.includes("2026"),
-            "Should protect or pass through digit runs");
+        assert.equal(result.preprocessed, "2026年");
+        assert.deepEqual(result.digitRuns, []);
     });
 
-    it("applies reading overrides", () => {
+    it("passes through compounds unchanged (readings in dict)", () => {
         const result = runPrePasses("行方不明", { targetScript: "katakana" });
-        // 行方不明 should get override reading ユクエフメイ
-        assert.ok(
-            result.preprocessed.includes("ユクエフメイ") || result.preprocessed === "行方不明",
-            `Unexpected: ${result.preprocessed}`
-        );
+        // Reading override map is empty — all readings migrated to dict patches
+        assert.equal(result.preprocessed, "行方不明");
     });
 });

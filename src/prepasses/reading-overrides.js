@@ -25,11 +25,10 @@
 import { katakanaToHiragana } from '../text/kana-script.js'
 
 const OVERRIDES_KATAKANA = {
-    // 行方不明 ("yukue fumei", missing/whereabouts unknown). NEologd picks
-    // the rare reading "ゆくえしれず → omokatashirezu" which only appears in
-    // archaic literary contexts. The standard news/spoken reading is
-    // ゆくえふめい. Triggered repeatedly in the NHK 50-snippet benchmark.
-    行方不明: 'ユクエフメイ',
+    // All reading overrides have been migrated to the dict hot-patch
+    // (dict-files/build/patches.csv). This map is intentionally empty.
+    // Use patches.csv for new entries — they go through the tokenizer's
+    // Viterbi with proper cost weighting instead of string replacement.
 }
 
 // Hiragana mirror, built mechanically from the katakana table so the two

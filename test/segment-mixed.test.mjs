@@ -28,12 +28,12 @@ describe("segmentMixed", () => {
         assert.ok(segs[0].text.includes("Yahoo"));
     });
 
-    it("moves leading particle to foreign segment", () => {
+    it("keeps particles in Japanese segments", () => {
         const segs = segmentMixed("JavaScriptの設定");
-        // の should be moved to the foreign segment (JavaScriptの)
-        const foreign = segs.find(s => s.type === "foreign");
-        assert.ok(foreign);
-        assert.ok(foreign.text.includes("の"), `Expected の in foreign segment: ${foreign.text}`);
+        // の stays in JP segment so the tokenizer can resolve it correctly
+        const jpSegs = segs.filter(s => s.type === "japanese");
+        const hasParticle = jpSegs.some(s => s.text.includes("の"));
+        assert.ok(hasParticle, "Expected の in a JP segment");
     });
 
     it("splits on sentence punctuation", () => {

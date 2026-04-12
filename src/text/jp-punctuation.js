@@ -49,6 +49,9 @@ export const JP_PUNCT_TO_ASCII = {
     //         compound names; collapse to "/" which is the closest
     //         ASCII semantic.
     '・': '/', // U+30FB katakana middle dot (raw form before kusanaji)
+    '〜': '~', // U+301C wave dash
+    '〝': '"', // U+301D reversed double prime quotation mark
+    '〟': '"', // U+301F low double prime quotation mark
     'ー': '-', // U+30FC katakana prolonged sound mark — fallback for edge
     //         cases where the romaji converter didn't handle it (e.g.
     //         standalone ー after a non-kana token). In proper romaji this
