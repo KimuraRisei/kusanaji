@@ -59,3 +59,18 @@ export function stripMacrons(text) {
         .replace(/ē/g, 'ee')
         .replace(/ō/g, 'ou')
 }
+
+/**
+ * Convert macrons to circumflex — nihon-shiki and kunrei-shiki use
+ * circumflex (â î û ê ô) per ISO 3602, not macrons (ā ī ū ē ō).
+ * The `japanese` npm package's nihon preset incorrectly uses macrons;
+ * this post-pass corrects it.
+ */
+export function macronToCircumflex(text) {
+    return text
+        .replace(/ā/g, 'â')
+        .replace(/ī/g, 'î')
+        .replace(/ū/g, 'û')
+        .replace(/ē/g, 'ê')
+        .replace(/ō/g, 'ô')
+}

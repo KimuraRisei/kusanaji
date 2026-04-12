@@ -23,7 +23,7 @@ import { isWordToken } from './token-helpers.js'
 import { particleOverride } from './particle-override.js'
 import { applyMacrons } from './long-vowels.js'
 import { joinVerbForms } from './join-verb-forms.js'
-import { JAPANESE_PRESET_BY_SYSTEM, WAPURO_CONFIG } from './systems.js'
+import { JAPANESE_PRESET_BY_SYSTEM, WAPURO_CONFIG, macronToCircumflex } from './systems.js'
 import { katakanaToHiragana, hasKana, normalizeReading } from '../text/kana-script.js'
 import { isPureKanjiSurface, removeKanji } from '../text/kanji-script.js'
 import { normalizeJpPunctuation } from '../text/jp-punctuation.js'
@@ -82,6 +82,13 @@ export function emitTableLoop(preprocessed, digitRuns, deps, opts) {
             } else {
                 const preset = JAPANESE_PRESET_BY_SYSTEM[system]
                 chunk = romanize(chunk, preset)
+            }
+            // nihon-shiki: the `japanese` npm package's nihon preset
+            // incorrectly uses macrons (ō) instead of circumflex (ô).
+            // ISO 3602 requires circumflex for both nihon- and kunrei-shiki.
+            // kunrei preset is already correct; fix nihon here.
+            if (system === 'nihon-shiki') {
+                chunk = macronToCircumflex(chunk)
             }
         }
 

@@ -103,7 +103,7 @@ class Kusanaji {
                     if (options.mode === "normal") {
                         return tokens.map(token => token.reading).join("");
                     }
-                    return tokens.map(token => token.reading).join(" ");
+                    return tokens.map(token => token.reading).join(" ").replace(/ {2,}/g, ' ').trim();
                 case "romaji":
                     const romajiConv = (token) => {
                         let preToken;
@@ -130,26 +130,36 @@ class Kusanaji {
                                 tokens[hi].reading = toRawHiragana(tokens[hi].reading);
                                 let tmp = "";
                                 let hpattern = "";
+                                let isLastKanji = false;
+                                const hparts = [];
                                 for (let hc = 0; hc < tokens[hi].surface_form.length; hc++) {
                                     if (isKanji(tokens[hi].surface_form[hc])) {
-                                        hpattern += "(.*?)";
+                                        if (!isLastKanji) {
+                                            isLastKanji = true;
+                                            hpattern += "(.+?)";
+                                            hparts.push(tokens[hi].surface_form[hc]);
+                                        } else {
+                                            hparts[hparts.length - 1] += tokens[hi].surface_form[hc];
+                                        }
                                     }
                                     else {
+                                        isLastKanji = false;
                                         const hch = tokens[hi].surface_form[hc];
+                                        hparts.push(hch);
                                         hpattern += isKatakana(hch) ? toRawHiragana(hch) : Kusanaji._escapeRegex(hch);
                                     }
                                 }
-                                const hreg = new RegExp(hpattern);
+                                const hreg = new RegExp(`^${hpattern}$`);
                                 const hmatches = hreg.exec(tokens[hi].reading);
                                 if (hmatches) {
                                     let pickKJ = 0;
-                                    for (let hc1 = 0; hc1 < tokens[hi].surface_form.length; hc1++) {
-                                        if (isKanji(tokens[hi].surface_form[hc1])) {
+                                    for (let hp = 0; hp < hparts.length; hp++) {
+                                        if (isKanji(hparts[hp][0])) {
                                             tmp += hmatches[pickKJ + 1];
                                             pickKJ++;
                                         }
                                         else {
-                                            tmp += tokens[hi].surface_form[hc1];
+                                            tmp += hparts[hp];
                                         }
                                     }
                                     tokens[hi].reading = tmp;
@@ -163,7 +173,7 @@ class Kusanaji {
                     if (options.mode === "normal") {
                         return tokens.map(token => token.reading).join("");
                     }
-                    return tokens.map(token => token.reading).join(" ");
+                    return tokens.map(token => token.reading).join(" ").replace(/ {2,}/g, ' ').trim();
                 default:
                     throw new Error("Unknown option.to param");
             }
