@@ -9,6 +9,8 @@
  * tokenization so each chunk is short enough for the Viterbi to handle.
  */
 
+import { normalizeInput } from '../prepasses/normalize-input.js'
+
 // Japanese character ranges
 const JP_CHAR = /[\u3000-\u303F\u3040-\u309F\u30A0-\u30FF\u3400-\u4DBF\u4E00-\u9FFF\uF900-\uFAFF\uFF65-\uFF9F]/
 
@@ -36,6 +38,12 @@ function isJpChar(ch) {
  */
 export function segmentMixed(text) {
     if (!text) return []
+
+    // ── Normalize fullwidth ASCII before segmentation ───────────────
+    // Fullwidth Latin (U+FF01–FF5E) is classified as Japanese by isJpChar()
+    // which causes characters like Ｅ, ＹＯＳＨＩＫＩ to land in JP segments
+    // and leak into output unchanged. Normalize to halfwidth first.
+    text = normalizeInput(text)
 
     // ── Pass 1: split on language boundaries ────────────────────────
     const raw = []
@@ -71,19 +79,22 @@ export function segmentMixed(text) {
     }
     if (currentText) raw.push({ type: currentType || 'foreign', text: currentText })
 
-    // ── Pass 2: move leading particles from JP segments to preceding foreign ─
-    const LEADING_PARTICLES = /^([のはをがでともにへやか、。]+)/
-    for (let i = 1; i < raw.length; i++) {
-        if (raw[i].type !== 'japanese' || raw[i - 1].type !== 'foreign') continue
-        const m = raw[i].text.match(LEADING_PARTICLES)
+    // ── Pass 1.5: pull trailing digits into following JP segment ────
+    // Digits (0-9) are foreign, but when they immediately precede a JP
+    // segment they're almost always a counter prefix (3月, 15日, 100人).
+    // The counter prepasses need to see "3月" as a unit to fire, so
+    // merge trailing digits from foreign segments into the next JP segment.
+    for (let i = 0; i < raw.length - 1; i++) {
+        if (raw[i].type !== 'foreign' || raw[i + 1].type !== 'japanese') continue
+        const m = raw[i].text.match(/(\d+)$/)
         if (m) {
-            raw[i - 1].text += m[1]
-            raw[i].text = raw[i].text.slice(m[1].length)
+            raw[i + 1].text = m[1] + raw[i + 1].text
+            raw[i].text = raw[i].text.slice(0, -m[1].length)
             if (!raw[i].text) { raw.splice(i, 1); i-- }
         }
     }
 
-    // ── Pass 3: micro-split Japanese segments ───────────────────────
+    // ── Pass 2: micro-split Japanese segments ───────────────────────
     // Split on EVERY natural boundary so the Viterbi never sees >15 chars:
     //   - Sentence punctuation: 。！？
     //   - Clause punctuation: 、

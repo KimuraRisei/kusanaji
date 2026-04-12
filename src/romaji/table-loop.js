@@ -22,6 +22,7 @@
 import { isWordToken } from './token-helpers.js'
 import { particleOverride } from './particle-override.js'
 import { applyMacrons } from './long-vowels.js'
+import { joinVerbForms } from './join-verb-forms.js'
 import { JAPANESE_PRESET_BY_SYSTEM, WAPURO_CONFIG } from './systems.js'
 import { katakanaToHiragana, hasKana, normalizeReading } from '../text/kana-script.js'
 import { isPureKanjiSurface, removeKanji } from '../text/kanji-script.js'
@@ -97,6 +98,11 @@ export function emitTableLoop(preprocessed, digitRuns, deps, opts) {
         out += chunk
         prevWasWord = true
     }
+
+    // Join detached verb auxiliaries (shi te → shite, mashi ta → mashita).
+    // The token loop inserts spaces between morphemes, which splits inflected
+    // verb forms. joinVerbForms glues them back — same pass the MH path uses.
+    if (sepChar === ' ') out = joinVerbForms(out)
 
     // Restore digit-run placeholders inserted by preprocessDigits.
     out = restoreDigits(out, digitRuns)

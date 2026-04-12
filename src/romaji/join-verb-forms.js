@@ -7,9 +7,9 @@
  * Each pass is targeted rather than blanket — order matters, longer forms
  * first. Loops to fixed-point because some inputs need 2-3 passes.
  *
- * Used by the Modified Hepburn emitter only — the table-loop emitter for
- * the 4 non-MH systems doesn't need this because its custom kusamoji
- * loop walks tokens directly without the kusanaji spacing artefact.
+ * Used by both the Modified Hepburn emitter and the table-loop emitter.
+ * Includes patterns for both Hepburn (shi/chi) and nihon/kunrei (si/ti)
+ * romanization variants.
  */
 
 const AUX_PIECE_REWRITES = [
@@ -22,15 +22,21 @@ const AUX_PIECE_REWRITES = [
     [/\btari ta\b/g, 'tarita'],
     [/\bnakat ta\b/g, 'nakatta'],
     [/\bnakere ba\b/g, 'nakereba'],
+    // nihon-shiki / kunrei-shiki variants (し→si)
+    [/\bmasi ta\b/g, 'masita'],
+    [/\bmasi te\b/g, 'masite'],
+    [/\bdesi ta\b/g, 'desita'],
+    [/\bmasyo u\b/g, 'masyō'],
+    [/\bdesyo u\b/g, 'desyō'],
 ]
 
-const AUX_SUFFIX_RE = /\b([a-zāīūēō]+) (masu|mashita|mashite|masen|mashō|deshita|deshō|tara|tari)\b/g
+const AUX_SUFFIX_RE = /\b([a-zāīūēō]+) (masu|mas[hi]+ta|mas[hi]+te|masen|mashō|masyō|des[hi]+ta|deshō|desyō|tara|tari)\b/g
 
 // "de" deliberately excluded from the verb-tail glue — it's a particle
 // homograph and merging "shinkansen de" → "shinkansende" would be wrong.
-// Left side must end in i/e (ren'yōkei stems) and be at least 2 chars to
-// skip 1-mora ambiguity (i ta → ita, where "i" might be a content word).
-const VERB_TAIL_RE = /\b([a-zāīūēō]{2,}[ie]) (ta|te|da)\b/g
+// Left side must end in i/e (ren'yōkei stems) and be at least 2 chars
+// (covers nihon/kunrei 2-char stems like "si", "ki", "mi").
+const VERB_TAIL_RE = /\b([a-zāīūēō]+[ie]) (ta|te|da)\b/g
 
 const PASSIVE_RE = /\bsa re (ta|te|nai|nakatta|masu|mashita|mashite)\b/g
 
