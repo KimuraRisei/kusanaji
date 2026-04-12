@@ -1,30 +1,20 @@
 /**
- * The 4-pre-pass sequence shared by both `toRomaji` and `toKana`.
+ * Pre-pass sequence — intentionally minimal.
  *
- * Order matters and is enforced here as the single source of truth:
+ * The NEologd dictionary handles all counter readings natively:
+ *   4月→シガツ, 1本→イッポン, 100人→ヒャクニン, 24時間→ニジュウヨジカン,
+ *   100均→ヒャッキン, 365日→サンビャクロクジュウゴニチ, etc.
  *
- *   1. applyReadingOverrides — manual overrides for compounds where NEologd
- *      picks a wrong reading (currently 行方不明).
- *   2. applyIrregularCounterReadings — substitute the FULL canonical reading
- *      for irregular (digit, counter) pairs (1本 → イッポン, 4月 → シガツ,
- *      1日 → ツイタチ, ...). The digit is consumed.
- *   3. rewriteCounters — handle the regular counter cases (3月 → 3ガツ,
- *      preserving the digit). Blocks on COMPOUND_BLOCKLIST so 6年生
- *      doesn't become 6ネン生.
- *   4. preprocessDigits — protect any remaining ASCII digit runs from
- *      NEologd's compound number entries by replacing them with XX<l>XX
- *      placeholders. Returns both the placeholderized text and the run
- *      list, which the caller passes to restoreDigits after conversion.
+ * Counter prepasses and digit placeholders were REMOVED because they
+ * degrade tokenization — injecting katakana that the Viterbi re-segments
+ * incorrectly, and digit placeholders (XXaXX) that destroy compound
+ * lookups like 100均 and 24時間.
  *
- * Steps 2 and 3 are mutually exclusive per match — once step 2 fires on a
- * (digit, counter) pair, the pair is gone from the text and step 3 sees
- * nothing to do for it.
+ * Only applyReadingOverrides remains for the rare case where the
+ * dictionary picks an archaic reading (currently: 行方不明→ユクエフメイ).
  */
 
 import { applyReadingOverrides } from '../prepasses/reading-overrides.js'
-import { applyIrregularCounterReadings } from '../prepasses/counter-readings.js'
-import { rewriteCounters } from '../prepasses/counter-rewrite.js'
-import { preprocessDigits } from '../prepasses/digit-runs.js'
 
 /**
  * @param {string} text
@@ -34,8 +24,5 @@ import { preprocessDigits } from '../prepasses/digit-runs.js'
 export function runPrePasses(text, { targetScript }) {
     if (!text || typeof text !== 'string') return { preprocessed: '', digitRuns: [] }
     const a = applyReadingOverrides(text, { targetScript })
-    const b = applyIrregularCounterReadings(a, { targetScript })
-    const c = rewriteCounters(b, { targetScript })
-    const { placeholderized, runs } = preprocessDigits(c)
-    return { preprocessed: placeholderized, digitRuns: runs }
+    return { preprocessed: a, digitRuns: [] }
 }

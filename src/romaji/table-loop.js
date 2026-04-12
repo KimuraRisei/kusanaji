@@ -27,7 +27,6 @@ import { JAPANESE_PRESET_BY_SYSTEM, WAPURO_CONFIG } from './systems.js'
 import { katakanaToHiragana, hasKana, normalizeReading } from '../text/kana-script.js'
 import { isPureKanjiSurface, removeKanji } from '../text/kanji-script.js'
 import { normalizeJpPunctuation } from '../text/jp-punctuation.js'
-import { restoreDigits } from '../prepasses/digit-runs.js'
 import { resolveUnknownTokens } from '../text/unknown-fallback.js'
 
 /**
@@ -104,8 +103,6 @@ export function emitTableLoop(preprocessed, digitRuns, deps, opts) {
     // verb forms. joinVerbForms glues them back — same pass the MH path uses.
     if (sepChar === ' ') out = joinVerbForms(out)
 
-    // Restore digit-run placeholders inserted by preprocessDigits.
-    out = restoreDigits(out, digitRuns)
 
     return out
 }
