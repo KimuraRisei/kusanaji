@@ -15,9 +15,6 @@ import {
     toRawHiragana,
     toRawKatakana,
     toRawRomaji,
-    kanaToHiragna,
-    kanaToKatakana,
-    kanaToRomaji
 } from "./util.js";
 
 /**
@@ -330,9 +327,6 @@ const Util = {
     hasKana,
     hasKanji,
     hasJapanese,
-    kanaToHiragna,
-    kanaToKatakana,
-    kanaToRomaji
 };
 
 Kusanaji.Util = Util;
