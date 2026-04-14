@@ -20,6 +20,8 @@ export const JP_PUNCT_TO_ASCII = {
     '。': '.', // U+3002 ideographic full stop
     '「': '"', // U+300C left corner bracket
     '」': '"', // U+300D right corner bracket
+    '｢': '"', // U+FF62 halfwidth left corner bracket
+    '｣': '"', // U+FF63 halfwidth right corner bracket
     '『': '"', // U+300E left white corner bracket
     '』': '"', // U+300F right white corner bracket
     '【': '[', // U+3010 left black lenticular bracket
