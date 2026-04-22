@@ -1,6 +1,6 @@
 {
     "name": "kusanaji",
-    "version": "1.5.5",
+    "version": "1.5.6",
     "description": "Powerful Japanese text processor for Node.js — romaji conversion, hiragana, katakana, furigana with prepasses, mixed-language segmentation, traditional to modern kanji conversion, unicode normalization and kanji fallback",
     "author": "Kimura Risei <kimura.risei@gmail.com>",
     "license": "BUSL-1.1",
