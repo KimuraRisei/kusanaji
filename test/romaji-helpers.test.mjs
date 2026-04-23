@@ -1,10 +1,14 @@
 import { describe, it } from "node:test";
 import assert from "node:assert/strict";
+// Internal romaji helpers — not exposed via the `kusanaji/romaji` barrel,
+// imported directly from their source files.
 import { collapseLongVowels } from "../src/romaji/long-vowels.js";
 import { joinVerbForms } from "../src/romaji/join-verb-forms.js";
 import { joinDigitRuns, fixDecimalPointSpacing } from "../src/romaji/digit-postpass.js";
 import { isWordToken } from "../src/romaji/token-helpers.js";
-import { JAPANESE_PRESET_BY_SYSTEM } from "../src/romaji/systems.js";
+// Public preset map — via the barrel so this test also covers its
+// re-export from `kusanaji/romaji`.
+import { JAPANESE_PRESET_BY_SYSTEM } from "../src/romaji/index.js";
 
 describe("long-vowels", () => {
     it("collapses oo → ō", () => {

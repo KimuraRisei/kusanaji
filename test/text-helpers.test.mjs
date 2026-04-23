@@ -1,8 +1,14 @@
 import { describe, it } from "node:test";
 import assert from "node:assert/strict";
-import { katakanaToHiragana, hasKana, normalizeReading } from "../src/text/kana-script.js";
+// Public symbols — imported via the `kusanaji/text` barrel so this test
+// also verifies the barrel surface.
+import {
+    katakanaToHiragana, hasKana, normalizeReading,
+    normalizeJpPunctuation,
+} from "../src/text/index.js";
+// Internal-only helpers (not exposed via the public barrel) — imported
+// directly from their source files.
 import { isPureKanjiSurface, removeKanji } from "../src/text/kanji-script.js";
-import { normalizeJpPunctuation } from "../src/text/jp-punctuation.js";
 
 describe("kana-script", () => {
     it("converts katakana to hiragana", () => {

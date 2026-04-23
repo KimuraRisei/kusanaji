@@ -1,6 +1,7 @@
 import { describe, it } from "node:test";
 import assert from "node:assert/strict";
-import { resolveUnknownTokens } from "../src/text/unknown-fallback.js";
+// Via the barrel — `resolveUnknownTokens` is part of the `kusanaji/text` public API.
+import { resolveUnknownTokens } from "../src/text/index.js";
 
 describe("resolveUnknownTokens", () => {
     // Mock tokenizer that splits by character

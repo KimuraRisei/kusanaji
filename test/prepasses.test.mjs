@@ -1,6 +1,8 @@
 import { describe, it } from "node:test";
 import assert from "node:assert/strict";
-import { runPrePasses } from "../src/pipeline/prepasses.js";
+// Import via the barrel so this test also covers the fact that
+// `runPrePasses` is properly re-exported from `kusanaji/pipeline`.
+import { runPrePasses } from "../src/pipeline/index.js";
 
 describe("runPrePasses", () => {
     it("returns empty for null input", () => {
