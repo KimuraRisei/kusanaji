@@ -16,7 +16,7 @@ import {
     toRawKatakana,
     toRawRomaji,
 } from "./util.js";
-import { emitCounterReading, overrideSingleKanjiReading, preserveDigitToken } from "./counter-table.js";
+import { emitCounterReading, overrideSingleKanjiReading, preserveDigitToken, readDigitTokenAsKana } from "./counter-table.js";
 
 /**
  * Kusanaji Class
@@ -118,6 +118,7 @@ class Kusanaji {
                         overrideSingleKanjiReading(token, { to: "katakana" })
                         ?? emitCounterReading(token, { preserveDigits, to: "katakana" })
                         ?? preserveDigitToken(token, { preserveDigits })
+                        ?? readDigitTokenAsKana(token, { preserveDigits, to: "katakana" })
                         ?? token.reading;
                     if (options.mode === "normal") {
                         return tokens.map(emit).join("");
@@ -155,6 +156,11 @@ class Kusanaji {
                         const digitPreserve = preserveDigitToken(tokens[hi], { preserveDigits });
                         if (digitPreserve !== null) {
                             tokens[hi].reading = digitPreserve;
+                            continue;
+                        }
+                        const digitKana = readDigitTokenAsKana(tokens[hi], { preserveDigits, to: "hiragana" });
+                        if (digitKana !== null) {
+                            tokens[hi].reading = digitKana;
                             continue;
                         }
                         if (hasKanji(tokens[hi].surface_form)) {
