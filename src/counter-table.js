@@ -545,3 +545,85 @@ export function preserveDigitToken(token, opts) {
     if (!/^\d+$/.test(token.surface_form)) return null
     return token.surface_form
 }
+
+// Digit-by-digit kana reading map.
+// Used when preserveDigits=false for bare-digit tokens that kusamoji left
+// with `reading === surface` (it only produces compound number readings
+// when a counter follows). For product/model numbers like `530-6k`, a
+// digit-by-digit reading (ゴ・サン・レイ) is the natural pronunciation and
+// the closest safe default when there's no counter-driven context.
+//
+// Choice of variant (e.g. 0 → レイ not ゼロ, 4 → ヨン not シ, 7 → ナナ not
+// シチ, 9 → キュウ not ク) matches the modern spoken-Japanese convention
+// for reading loose digit sequences.
+const DIGIT_TO_KANA = Object.freeze({
+    '0': 'レイ',
+    '1': 'イチ',
+    '2': 'ニ',
+    '3': 'サン',
+    '4': 'ヨン',
+    '5': 'ゴ',
+    '6': 'ロク',
+    '7': 'ナナ',
+    '8': 'ハチ',
+    '9': 'キュウ',
+})
+
+/**
+ * When preserveDigits=false, read a pure-ASCII-digit token digit-by-digit
+ * as kana. This is the counterpart to `preserveDigitToken`: one fires
+ * when the user wants digits preserved as glyphs; this one fires when
+ * they want digits spoken.
+ *
+ * Triggers only on tokens whose surface is `^\d+$` — counter-compound
+ * tokens (`1本`, `4月`, `530円`) are handled by `emitCounterReading`
+ * before this helper runs and their compound readings are used; they
+ * never reach this fallback.
+ *
+ * Example: `530-6k` tokenizes to [530][-][6][k]. With preserveDigits=false:
+ *   530 → ゴサンレイ   (via this helper)
+ *   -   → - (passthrough)
+ *   6   → ロク        (via this helper)
+ *   k   → k           (passthrough — non-digit)
+ *
+ * @param {{ surface_form: string }} token
+ * @param {{ preserveDigits: boolean, to: 'hiragana' | 'katakana' }} opts
+ * @returns {string | null}
+ */
+export function readDigitTokenAsKana(token, opts) {
+    if (opts.preserveDigits) return null
+    if (!token?.surface_form) return null
+    if (!/^\d+$/.test(token.surface_form)) return null
+    let kana = ''
+    for (const d of token.surface_form) kana += DIGIT_TO_KANA[d]
+    return opts.to === 'hiragana' ? toRawHiragana(kana) : kana
+}
+
+/**
+ * Text-level counterpart to `readDigitTokenAsKana` — replaces every digit
+ * run inside `text` with its digit-by-digit kana reading. Non-digit chars
+ * (letters, hyphens, kanji, punctuation, etc.) pass through unchanged.
+ *
+ * Used for ASCII-dominant input runs that `segmentMixed` classifies as
+ * `foreign` and passes through without tokenization. A bare product-code
+ * like `530-6k` never reaches the token-level emit chain (it's not in a
+ * Japanese segment), so the token helper alone isn't enough — this
+ * text-level pass covers that path.
+ *
+ * Example:
+ *   digitsToKanaInText('530-6k', { to: 'hiragana' }) → 'ごさんれい-ろくk'
+ *   digitsToKanaInText('tel 03-1234-5678', { to: 'katakana' })
+ *     → 'tel レイサン-イチニサンヨン-ゴロクナナハチ'
+ *
+ * @param {string} text
+ * @param {{ to: 'hiragana' | 'katakana' }} opts
+ * @returns {string}
+ */
+export function digitsToKanaInText(text, opts) {
+    if (!text) return text
+    return text.replace(/\d+/g, (run) => {
+        let kana = ''
+        for (const d of run) kana += DIGIT_TO_KANA[d]
+        return opts.to === 'hiragana' ? toRawHiragana(kana) : kana
+    })
+}

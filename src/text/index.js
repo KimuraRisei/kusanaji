@@ -68,3 +68,9 @@ export {
 // internally but is semantically a text-layer transform — re-exported here
 // so downstream validators don't reach into prepasses/ paths.
 export { KYUJITAI_TO_SHINJITAI, normalizeInput } from '../prepasses/normalize-input.js'
+
+// Digit-run → kana text transform. Companion to the token-level
+// `readDigitTokenAsKana` (used inside the emit chain); this one is for
+// ASCII-only "foreign" segments that `segmentMixed` passes through
+// without tokenization — e.g. product codes like `530-6k`.
+export { digitsToKanaInText } from '../counter-table.js'
