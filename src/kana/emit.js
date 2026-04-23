@@ -12,11 +12,11 @@
  * @param {string} preprocessed - text post-runPrePasses
  * @param {string[]} digitRuns - from runPrePasses (unused, kept for interface compatibility)
  * @param {{ kusanaji: { convert: Function } }} deps
- * @param {{ to: 'hiragana' | 'katakana', mode: 'normal' | 'spaced' | 'okurigana' | 'furigana' }} opts
+ * @param {{ to: 'hiragana' | 'katakana', mode: 'normal' | 'spaced' | 'okurigana' | 'furigana', preserveDigitsInCounters?: boolean }} opts
  * @returns {Promise<string>}
  */
 export async function emitKana(preprocessed, digitRuns, deps, opts) {
     const { kusanaji } = deps
-    const { to, mode } = opts
-    return await kusanaji.convert(preprocessed, { to, mode })
+    const { to, mode, preserveDigitsInCounters } = opts
+    return await kusanaji.convert(preprocessed, { to, mode, preserveDigitsInCounters })
 }

@@ -41,6 +41,18 @@
         },
         "./text/jp-punctuation": {
             "import": "./src/text/jp-punctuation.js"
+        },
+        "./text/kana-script": {
+            "import": "./src/text/kana-script.js"
+        },
+        "./text/full-width-output": {
+            "import": "./src/text/full-width-output.js"
+        },
+        "./text/width-tables": {
+            "import": "./src/text/width-tables.js"
+        },
+        "./text/width-convert": {
+            "import": "./src/text/width-convert.js"
         }
     },
     "files": [

@@ -3,8 +3,11 @@
  *
  * 1. Fullwidth ASCII (U+FF01–FF5E) → halfwidth (U+0021–007E)
  *    so the segmenter classifies them as foreign, not Japanese.
+ *    Delegated to `fullToHalfWidth()` in `width-convert.js` — single
+ *    source of truth for HW↔FW tables.
  *
- * 2. Ideographic space (U+3000) → regular space.
+ * 2. Ideographic space (U+3000) → regular space. Also handled by
+ *    `fullToHalfWidth()` via its `convertSpaces` option.
  *
  * 3. Kyūjitai (旧字体) → shinjitai (新字体).
  *    NEologd only has post-1946 simplified kanji. Traditional forms
@@ -13,13 +16,45 @@
  *    pre-tokenization lets the dictionary match correctly.
  *
  *    The table below covers the ~364 kanji simplified in the 1946
- *    Tōyō Kanji reform and subsequent Jōyō Kanji revisions.
+ *    Tōyō Kanji reform and subsequent Jōyō Kanji revisions. This is
+ *    kusanaji-specific and NOT part of the generic width module.
  */
+
+import { fullToHalfWidth } from '../text/width-convert.js'
+
+// Daiji (大字) — legal/formal numerals. Only normalize daiji that have
+// NO modern non-daiji usage, otherwise we regress common words.
+//
+// Safe:
+//   壱 / 壹  →  一   (modern usage is strictly daiji; rare exception
+//                     is the place name 壱岐 which is accepted collateral)
+//   弐 / 貳  →  二   (no modern non-daiji usage)
+//
+// UNSAFE — DO NOT add back without a better strategy:
+//   参 → 三   breaks 参加 (sanka), 参考 (sankō), 参議院 (sangiin),
+//             参拝 (sanpai), 参照 (sanshō), 参上 (sanjō), etc. The test
+//             harness caught `参加 → サンガ` post-normalization; this is
+//             the furigana view revealing `三加` at tokenization time.
+//   拾 → 十   breaks 拾う (hirou, to pick up), 拾得物 (shūtokubutsu),
+//             and any verb use of 拾.
+//
+// 參 is the kyūjitai form of 参; we normalize 參→参 (not →三) so the
+// tokenizer sees the modern shinjitai, preserving correct reading.
+const DAIJI_TO_STANDARD = {
+    '壱': '一', '壹': '一',
+    '弐': '二', '貳': '二',
+    '參': '参',
+}
 
 // Complete kyūjitai (旧字体) → shinjitai (新字体) mapping.
 // Source: Jōyō Kanji reform (1946 Tōyō Kanji + 1981/2010 revisions).
 // Organized by Japanese radical order for maintainability.
-const KYUJITAI_TO_SHINJITAI = {
+//
+// Exported so downstream consumers (benchmarks, validation harnesses) can
+// account for this unconditional normalization when comparing input
+// kanji against output kanji. Do NOT mutate — use as read-only reference.
+export const KYUJITAI_TO_SHINJITAI = {
+    ...DAIJI_TO_STANDARD,
     // 一・丨・丶・丿
     '亞': '亜', '惡': '悪', '壓': '圧', '圍': '囲', '醫': '医',
     '壹': '壱', '稻': '稲', '飮': '飲', '隱': '隠',
@@ -89,28 +124,33 @@ const KYUJITAI_TO_SHINJITAI = {
 }
 
 /**
+ * Normalize input text before tokenization.
+ *
+ * Two passes applied in order:
+ *   1. Width normalization (FW ASCII → HW ASCII + ideographic space → ASCII space)
+ *      via `fullToHalfWidth`. Katakana is NOT converted here — FW katakana must
+ *      stay FW for the tokenizer to recognise it as Japanese.
+ *   2. Kyūjitai → shinjitai kanji substitution (kusanaji-specific).
+ *
  * @param {string} text
  * @returns {string}
  */
 export function normalizeInput (text) {
     if (!text) return text
+    // Step 1: FW ASCII + FW space → HW. Explicitly disable katakana
+    // conversion so that `カタカナ` stays `カタカナ` (required by the tokenizer's
+    // character classification).
+    const widthNormalized = fullToHalfWidth(text, {
+        convertAscii: true,
+        convertSpaces: true,
+        convertKatakana: false,
+        handleDakuten: false,
+    }).text
+    // Step 2: kyūjitai → shinjitai (char-by-char lookup).
     let out = ''
-    for (let i = 0; i < text.length; i++) {
-        const code = text.charCodeAt(i)
-        // Fullwidth ASCII variants (U+FF01 '！' .. U+FF5E '～') → halfwidth (U+0021 .. U+007E)
-        if (code >= 0xFF01 && code <= 0xFF5E) {
-            out += String.fromCharCode(code - 0xFEE0)
-            continue
-        }
-        // Ideographic space → regular space
-        if (code === 0x3000) {
-            out += ' '
-            continue
-        }
-        // Kyūjitai → shinjitai
-        const ch = text[i]
-        const simplified = KYUJITAI_TO_SHINJITAI[ch]
-        out += simplified ?? ch
+    for (let i = 0; i < widthNormalized.length; i++) {
+        const ch = widthNormalized[i]
+        out += KYUJITAI_TO_SHINJITAI[ch] ?? ch
     }
     return out
 }

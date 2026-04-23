@@ -16,6 +16,7 @@ import {
     toRawKatakana,
     toRawRomaji,
 } from "./util.js";
+import { emitCounterReading, overrideSingleKanjiReading, preserveDigitToken } from "./counter-table.js";
 
 /**
  * Kusanaji Class
@@ -98,12 +99,31 @@ class Kusanaji {
         const tokens = patchTokens(rawTokens);
 
         if (options.mode === "normal" || options.mode === "spaced") {
+            const preserveDigits = options.preserveDigitsInCounters === true;
             switch (options.to) {
-                case "katakana":
+                case "katakana": {
+                    // Three token-level overrides, in priority order:
+                    //   1. Single-kanji overrides (counter-table.js) —
+                    //      corrects main-dict defaults that return a nanori
+                    //      reading (e.g. 館 → タテ; we want カン).
+                    //   2. Counter-aware reading (IRREGULAR_COUNTER_KANA
+                    //      when preserveDigits=false, base counter when
+                    //      preserveDigits=true).
+                    //   3. Pure-digit token preservation when preserveDigits
+                    //      is set but the digits stand alone or precede a
+                    //      loanword counter that was tokenized separately
+                    //      (87パーセント, 360キロ, bare 2026).
+                    // Fall through to token.reading otherwise.
+                    const emit = (token) =>
+                        overrideSingleKanjiReading(token, { to: "katakana" })
+                        ?? emitCounterReading(token, { preserveDigits, to: "katakana" })
+                        ?? preserveDigitToken(token, { preserveDigits })
+                        ?? token.reading;
                     if (options.mode === "normal") {
-                        return tokens.map(token => token.reading).join("");
+                        return tokens.map(emit).join("");
                     }
-                    return tokens.map(token => token.reading).join(" ").replace(/ {2,}/g, ' ').trim();
+                    return tokens.map(emit).join(" ").replace(/ {2,}/g, ' ').trim();
+                }
                 case "romaji":
                     const romajiConv = (token) => {
                         let preToken;
@@ -121,6 +141,22 @@ class Kusanaji {
                     return tokens.map(romajiConv).join(" ");
                 case "hiragana":
                     for (let hi = 0; hi < tokens.length; hi++) {
+                        // Override priority, same as katakana path.
+                        const singleOverride = overrideSingleKanjiReading(tokens[hi], { to: "hiragana" });
+                        if (singleOverride !== null) {
+                            tokens[hi].reading = singleOverride;
+                            continue;
+                        }
+                        const counterOverride = emitCounterReading(tokens[hi], { preserveDigits, to: "hiragana" });
+                        if (counterOverride !== null) {
+                            tokens[hi].reading = counterOverride;
+                            continue;
+                        }
+                        const digitPreserve = preserveDigitToken(tokens[hi], { preserveDigits });
+                        if (digitPreserve !== null) {
+                            tokens[hi].reading = digitPreserve;
+                            continue;
+                        }
                         if (hasKanji(tokens[hi].surface_form)) {
                             if (!hasKatakana(tokens[hi].surface_form)) {
                                 tokens[hi].reading = toRawHiragana(tokens[hi].reading);
