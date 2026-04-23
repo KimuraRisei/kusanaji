@@ -1,16 +1,14 @@
 /**
  * Pre-pass sequence — intentionally minimal.
  *
- * The NEologd dictionary handles all counter readings natively:
+ * The NEologd dictionary handles most counter readings natively:
  *   4月→シガツ, 1本→イッポン, 100人→ヒャクニン, 24時間→ニジュウヨジカン,
  *   100均→ヒャッキン, 365日→サンビャクロクジュウゴニチ, etc.
  *
- * Counter prepasses and digit placeholders were REMOVED because they
- * degrade tokenization — injecting katakana that the Viterbi re-segments
- * incorrectly, and digit placeholders (XXaXX) that destroy compound
- * lookups like 100均 and 24時間.
+ * Counter-handling lives AT THE TOKEN LEVEL in `counter-table.js` plus the
+ * per-token override in `core.js`, NOT as a text-level prepass.
  *
- * Only applyReadingOverrides remains for the rare case where the
+ * Only `applyReadingOverrides` remains here for the rare case where the
  * dictionary picks an archaic reading (currently: 行方不明→ユクエフメイ).
  */
 

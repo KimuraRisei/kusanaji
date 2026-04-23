@@ -128,7 +128,7 @@ await kusanaji.convert('ＪＲ東日本とＹＯＳＨＩＫＩが共演', {
 
 ### Kyūjitai (旧字体) → shinjitai (新字体)
 
-Traditional kanji forms from Macau, Taiwan, or historical text are normalized to post-1946 simplified forms (326 mappings) so the tokenizer can look them up:
+Traditional kanji forms from Macau, Taiwan, or historical text are normalized to post-1946 simplified forms (~284 mappings) so the tokenizer can look them up:
 
 ```js
 await kusanaji.convert('綜合醫院で發表された聲明', {
