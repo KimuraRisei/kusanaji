@@ -1,12 +1,14 @@
 import { describe, it } from "node:test";
 import assert from "node:assert/strict";
+// Via the barrel — all five fallback helpers are part of the
+// `kusanaji/text` public API.
 import {
     initKanjiFallback,
     applyKanjiFallback,
     isFallbackReady,
     loadFallbackFromBinary,
     loadFallbackFromCsv,
-} from "../src/text/kanji-fallback.js";
+} from "../src/text/index.js";
 
 describe("kanji-fallback", () => {
     describe("loadFallbackFromCsv", () => {

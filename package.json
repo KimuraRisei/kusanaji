@@ -1,6 +1,6 @@
 {
     "name": "kusanaji",
-    "version": "1.5.6",
+    "version": "1.6.0",
     "description": "Powerful Japanese text processor for Node.js — romaji conversion, hiragana, katakana, furigana with prepasses, mixed-language segmentation, traditional to modern kanji conversion, unicode normalization and kanji fallback",
     "author": "Kimura Risei <kimura.risei@gmail.com>",
     "license": "BUSL-1.1",
@@ -14,46 +14,11 @@
     },
     "main": "src/index.js",
     "exports": {
-        ".": {
-            "import": "./src/index.js",
-            "default": "./src/index.js"
-        },
-        "./pipeline": {
-            "import": "./src/pipeline/prepasses.js"
-        },
-        "./romaji": {
-            "import": "./src/romaji/emit.js"
-        },
-        "./romaji/systems": {
-            "import": "./src/romaji/systems.js"
-        },
-        "./kana": {
-            "import": "./src/kana/emit.js"
-        },
-        "./text": {
-            "import": "./src/text/segment-mixed.js"
-        },
-        "./text/kanji-fallback": {
-            "import": "./src/text/kanji-fallback.js"
-        },
-        "./text/unknown-fallback": {
-            "import": "./src/text/unknown-fallback.js"
-        },
-        "./text/jp-punctuation": {
-            "import": "./src/text/jp-punctuation.js"
-        },
-        "./text/kana-script": {
-            "import": "./src/text/kana-script.js"
-        },
-        "./text/full-width-output": {
-            "import": "./src/text/full-width-output.js"
-        },
-        "./text/width-tables": {
-            "import": "./src/text/width-tables.js"
-        },
-        "./text/width-convert": {
-            "import": "./src/text/width-convert.js"
-        }
+        ".":         { "import": "./src/index.js", "default": "./src/index.js" },
+        "./pipeline":{ "import": "./src/pipeline/index.js" },
+        "./romaji":  { "import": "./src/romaji/index.js" },
+        "./kana":    { "import": "./src/kana/index.js" },
+        "./text":    { "import": "./src/text/index.js" }
     },
     "files": [
         "src/",

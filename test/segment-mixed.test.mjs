@@ -1,6 +1,7 @@
 import { describe, it } from "node:test";
 import assert from "node:assert/strict";
-import { segmentMixed, hasJapanese } from "../src/text/segment-mixed.js";
+// Via the barrel — both symbols are part of the `kusanaji/text` public API.
+import { segmentMixed, hasJapanese } from "../src/text/index.js";
 
 describe("segmentMixed", () => {
     it("returns empty for null/empty", () => {
