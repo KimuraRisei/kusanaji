@@ -80,6 +80,12 @@ class Kusanaji {
         options.romajiSystem = options.romajiSystem || ROMANIZATION_SYSTEM.HEPBURN;
         options.delimiter_start = options.delimiter_start || "(";
         options.delimiter_end = options.delimiter_end || ")";
+        // Default true → backward compatible. When the caller explicitly passes
+        // `false`, an output post-pass converts any input katakana spans to
+        // hiragana on a hiragana-target conversion. Without this, kusanaji's
+        // hiragana path returns `surface_form` for non-kanji tokens, leaving
+        // input katakana like `テレビ` unchanged in the output.
+        if (options.keepOriginalKatakana === undefined) options.keepOriginalKatakana = true;
         str = str || "";
 
         if (["hiragana", "katakana", "romaji"].indexOf(options.to) === -1) {
@@ -97,6 +103,24 @@ class Kusanaji {
 
         const rawTokens = await this._analyzer.parse(str);
         const tokens = patchTokens(rawTokens);
+
+        // Output post-pass — applied to every kana-target return path. Two rules:
+        //  • to=katakana: ALWAYS run toRawKatakana on the full output so any
+        //    surface-preserved hiragana (e.g. okurigana mode's particle text
+        //    `です`) ends up in katakana. For normal/spaced this is a no-op
+        //    because tokens already emit katakana via `.reading`.
+        //  • to=hiragana: run toRawHiragana ONLY when the caller explicitly
+        //    passes `keepOriginalKatakana: false`. The default true preserves
+        //    input katakana (loanwords, brand names) — that's the existing
+        //    contract for direct kusanaji users. Downstream services that
+        //    expose a "convert all katakana to hiragana" UI checkbox forward
+        //    `false` here.
+        // Romaji paths bypass this — they have their own post-pass chain.
+        const finalize = (s) => {
+            if (options.to === "katakana") return toRawKatakana(s);
+            if (options.to === "hiragana" && options.keepOriginalKatakana === false) return toRawHiragana(s);
+            return s;
+        };
 
         if (options.mode === "normal" || options.mode === "spaced") {
             const preserveDigits = options.preserveDigitsInCounters === true;
@@ -121,9 +145,9 @@ class Kusanaji {
                         ?? readDigitTokenAsKana(token, { preserveDigits, to: "katakana" })
                         ?? token.reading;
                     if (options.mode === "normal") {
-                        return tokens.map(emit).join("");
+                        return finalize(tokens.map(emit).join(""));
                     }
-                    return tokens.map(emit).join(" ").replace(/ {2,}/g, ' ').trim();
+                    return finalize(tokens.map(emit).join(" ").replace(/ {2,}/g, ' ').trim());
                 }
                 case "romaji":
                     const romajiConv = (token) => {
@@ -213,9 +237,9 @@ class Kusanaji {
                         }
                     }
                     if (options.mode === "normal") {
-                        return tokens.map(token => token.reading).join("");
+                        return finalize(tokens.map(token => token.reading).join(""));
                     }
-                    return tokens.map(token => token.reading).join(" ").replace(/ {2,}/g, ' ').trim();
+                    return finalize(tokens.map(token => token.reading).join(" ").replace(/ {2,}/g, ' ').trim());
                 default:
                     throw new Error("Unknown option.to param");
             }
@@ -319,7 +343,7 @@ class Kusanaji {
                             }
                         }
                     }
-                    return result;
+                    return finalize(result);
                 case "romaji":
                     if (options.mode === "okurigana") {
                         for (let n2 = 0; n2 < notations.length; n2++) {
@@ -360,7 +384,7 @@ class Kusanaji {
                             }
                         }
                     }
-                    return result;
+                    return finalize(result);
                 default:
                     throw new Error("Invalid Target Syllabary.");
             }

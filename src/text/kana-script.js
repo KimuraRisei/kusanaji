@@ -14,8 +14,22 @@
  * @returns {string}
  */
 export function katakanaToHiragana(text) {
-    return text.replace(/[\u30A1-\u30F6]/g, (ch) =>
+    return text.replace(/[ァ-ヶ]/g, (ch) =>
         String.fromCharCode(ch.charCodeAt(0) - 0x60)
+    )
+}
+
+/**
+ * Inverse of `katakanaToHiragana` — shift each char in U+3041..U+3096
+ * (hiragana) up by 0x60 to its katakana counterpart. Chars outside that
+ * range pass through unchanged.
+ *
+ * @param {string} text
+ * @returns {string}
+ */
+export function hiraganaToKatakana(text) {
+    return text.replace(/[ぁ-ゖ]/g, (ch) =>
+        String.fromCharCode(ch.charCodeAt(0) + 0x60)
     )
 }
 
@@ -26,7 +40,7 @@ export function katakanaToHiragana(text) {
  * @returns {boolean}
  */
 export function hasKana(text) {
-    return /[\u3040-\u309F\u30A0-\u30FF]/.test(text)
+    return /[぀-ゟ゠-ヿ]/.test(text)
 }
 
 /**

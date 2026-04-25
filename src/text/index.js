@@ -33,7 +33,7 @@ export { resolveUnknownTokens } from './unknown-fallback.js'
 export { JP_PUNCT_TO_ASCII, normalizeJpPunctuation } from './jp-punctuation.js'
 
 // Kana-script helpers (hiragana↔katakana shift, classification)
-export { hasKana, katakanaToHiragana, normalizeReading } from './kana-script.js'
+export { hasKana, katakanaToHiragana, hiraganaToKatakana, normalizeReading } from './kana-script.js'
 
 // Width conversion — the full bidirectional module + its data tables
 export { toFullWidthOutput } from './full-width-output.js'

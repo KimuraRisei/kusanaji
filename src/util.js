@@ -1,5 +1,8 @@
-const KATAKANA_HIRAGANA_SHIFT = "\u3041".charCodeAt(0) - "\u30a1".charCodeAt(0);
-const HIRAGANA_KATAKANA_SHIFT = "\u30a1".charCodeAt(0) - "\u3041".charCodeAt(0);
+// Re-imported from text/kana-script.js so util.js doesn't ship a second
+// copy of the same 0x60 Unicode shift. The `toRaw*` aliases keep core.js
+// imports stable (it imports `toRawHiragana` / `toRawKatakana` from here).
+import { katakanaToHiragana as toRawHiragana, hiraganaToKatakana as toRawKatakana } from './text/kana-script.js';
+
 const ROMANIZATION_SYSTEM = {
     NIPPON: "nippon",
     PASSPORT: "passport",
@@ -1330,23 +1333,9 @@ const hasJapanese = function (str) {
  * @param {string} str Given string
  * @return {string} Hiragana string
  */
-const toRawHiragana = function (str) {
-    return str.replace(/[\u30a1-\u30f6]/g,
-        ch => String.fromCharCode(ch.charCodeAt(0) + KATAKANA_HIRAGANA_SHIFT)
-    );
-};
-
-/**
- * Convert kana to katakana
- *
- * @param {string} str Given string
- * @return {string} Katakana string
- */
-const toRawKatakana = function (str) {
-    return str.replace(/[\u3041-\u3096]/g,
-        ch => String.fromCharCode(ch.charCodeAt(0) + HIRAGANA_KATAKANA_SHIFT)
-    );
-};
+// `toRawHiragana` / `toRawKatakana` come from text/kana-script.js (top
+// of this file). They used to be defined inline here, byte-identical to
+// the kana-script versions \u2014 that redundant copy was removed.
 
 /**
  * Convert kana to romaji
