@@ -6,7 +6,7 @@
  * True iff this kusamoji token represents a "real word" (not punctuation
  * or symbol). The custom romaji loop must skip non-word tokens entirely
  * and emit their surface form directly via the punctuation normalizer —
- * see CLAUDE.md "Output invariant for /v1/romaji" for the kaomoji-leak
+ * see project memory, "Output invariant for romaji output", for the kaomoji-leak
  * backstory.
  *
  * @param {object} token kusamoji token with surface_form and pos
