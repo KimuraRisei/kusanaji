@@ -3,10 +3,10 @@
  *
  * Used by:
  *   - Internal kusanaji pipeline: normalize-input.js (FW→HW), full-width-output.js (HW→FW).
- *   - the backend service /v2/width endpoint (via width-convert.js wrapper).
- *   - Downstream consumers that need the raw mappings (the frontend batch/width pages
- *     can re-export to keep their local Edge-runtime path, or forward to the
- *     dict-api endpoint for a thinner Vercel function).
+ *   - A downstream width-conversion HTTP endpoint (via width-convert.js wrapper).
+ *   - Downstream consumers that need the raw mappings (e.g. a batch/width page
+ *     can re-export to keep an in-process path, or forward to the HTTP endpoint
+ *     for a thinner function).
  *
  * Pure data + constants. Zero runtime deps. ESM. Works in Node and Edge
  * runtimes alike.

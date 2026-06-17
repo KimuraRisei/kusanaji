@@ -14,7 +14,7 @@
  *
  * History: ChatGPT caught a leak of 5,504 CJK punctuation chars per
  * snippet in the non-Hepburn romaji systems before this normalizer was
- * added — see project memory, "Output invariant for romaji output".
+ * added — see project memory, "Output normalizations applied by every conversion".
  *
  * NOTE on redundancy: Fullwidth ASCII (U+FF01–FF5E) is also handled by
  * `normalize-input.js` at segmentation time, so entries like '－' / '／' /

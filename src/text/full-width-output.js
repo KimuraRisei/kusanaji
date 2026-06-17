@@ -1,10 +1,10 @@
 /**
  * Full-width output post-pass — thin wrapper around `halfToFullWidth`.
  *
- * Kept as a stable re-export name because downstream (the backend service/src/converters/kana.js)
- * imports `toFullWidthOutput` by name. The actual transform lives in
+ * Kept as a stable re-export name because a downstream consumer imports
+ * `toFullWidthOutput` by name. The actual transform lives in
  * `width-convert.js` so there is a single implementation shared by the
- * yomi pipeline and the dedicated `/v2/width` endpoint.
+ * yomi pipeline and the dedicated width-conversion endpoint.
  *
  * Intentionally narrow — this is a cosmetic output transform; do NOT
  * use it on input text (which should be half-width-normalized first by

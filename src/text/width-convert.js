@@ -11,9 +11,9 @@
  *        normalize input before tokenization.
  *      - `full-width-output.js` uses `halfToFullWidth` as the opt-in
  *        `outputFullWidth` post-pass on kana/yomi output.
- *   2. the backend service `POST /v2/width` — direct HTTP wrapper.
- *   3. the frontend (optional) — re-exported via kusanaji's subpath exports if
- *      the Vercel batch route wants in-process conversion on Edge.
+ *   2. A downstream HTTP API — direct wrapper over a width-conversion endpoint.
+ *   3. A downstream web UI (optional) — re-exported via kusanaji's subpath exports
+ *      if a batch route wants in-process conversion.
  *
  * Zero runtime deps. Pure ESM. Edge-runtime safe.
  */
