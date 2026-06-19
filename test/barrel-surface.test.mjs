@@ -4,7 +4,7 @@
  * kusanaji exposes five subpaths in package.json — `.`, `./pipeline`,
  * `./romaji`, `./kana`, `./text`. Each is backed by an `index.js` barrel
  * that re-exports a specific set of symbols. Downstream consumers
- * (the backend service, benchmarks, etc.) import from these barrels rather
+ * (benchmarks, external packages, etc.) import from these barrels rather
  * than reaching into individual source files.
  *
  * If a symbol is accidentally dropped from a barrel during a refactor,

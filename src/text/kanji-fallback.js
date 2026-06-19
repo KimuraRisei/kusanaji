@@ -22,7 +22,7 @@ let _maxKeyLen = 0
 
 /**
  * Initialize the fallback lookup from a pre-built Map.
- * Called once at boot by the consumer (dict-api).
+ * Called once at boot by the consumer.
  *
  * @param {Map<string, string>} map - surface → katakana reading
  */
