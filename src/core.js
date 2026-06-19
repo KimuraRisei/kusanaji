@@ -158,6 +158,19 @@ class Kusanaji {
                         else {
                             preToken = token.surface_form;
                         }
+                        // Hepburn long-vowel fix: the table-driven converter only
+                        // folds おう/うう that lands as a clean token-final mora, so
+                        // internal おう in a multi-mora on-yomi reading (最新情報 →
+                        // saishinjouhō) stays raw. Normalize オ段/ウ段 + ウ → +ー so
+                        // the existing ー→macron pass folds it. POS-gated to skip
+                        // 動詞/助動詞/形容詞 so verb/adj う endings are untouched
+                        // (思う stays omou, 言う stays iu — NOT omō/iyū).
+                        if (options.romajiSystem === ROMANIZATION_SYSTEM.HEPBURN
+                            && token.pos !== "動詞" && token.pos !== "助動詞" && token.pos !== "形容詞") {
+                            preToken = preToken
+                                .replace(/([オコソトノホモヨロヲゴゾドボポォョ])ウ/g, "$1ー")
+                                .replace(/([ウクスツヌフムユルグズブプゥュ])ウ/g, "$1ー");
+                        }
                         return toRawRomaji(preToken, options.romajiSystem);
                     };
                     if (options.mode === "normal") {
